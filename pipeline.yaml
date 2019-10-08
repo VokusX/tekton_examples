@@ -24,11 +24,11 @@ spec:
           value: $(inputs.params.toolchainID)
       command: ["/bin/sh", "-c"]
       args:
-        - git clone --single-branch --branch toolchainJson https://github.com/VokusX/testPRJuly;
+        - git clone --single-branch --branch toolchainJson https://github.com/VokusX/tekton_examples;
           ibmcloud config --check-version=false;
           ibmcloud login --apikey $APIKEY -a cloud.ibm.com -r $REGION;
           TOKEN=$(ibmcloud iam oauth-tokens | cut -c 11-);
-          curl -X GET "https://cloud.ibm.com/devops/toolchains/${TOOLCHAIN_ID}" -H "Accept:application/json" -H "Authorization:${TOKEN}" > testPRJuly/toolchain.json;
+          curl -X GET "https://cloud.ibm.com/devops/toolchains/${TOOLCHAIN_ID}" -H "Accept:application/json" -H "Authorization:${TOKEN}" > tekton_examples/toolchain.json;
           echo $(node testPRJuly/parser.js);
 ---
 apiVersion: tekton.dev/v1alpha1
