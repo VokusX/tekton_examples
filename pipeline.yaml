@@ -1,0 +1,109 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: task
+spec:
+  inputs:
+    params:
+      - name: apikey
+        description: the ibmcloud api key
+      - name: region
+        description: the ibmcloud region
+        default: us-south
+      - name: toolchainID
+        description: the toolchain id        
+  steps:
+    - name: get-toolchain-json
+      image: ibmcom/pipeline-base-image
+      env:
+        - name: APIKEY
+          value: $(inputs.params.apikey)
+        - name: REGION
+          value: $(inputs.params.region)
+        - name: TOOLCHAIN_ID
+          value: $(inputs.params.toolchainID)
+      command: ["/bin/sh", "-c"]
+      args:
+        - git clone --single-branch --branch toolchainJson https://github.com/VokusX/testPRJuly;
+          ibmcloud config --check-version=false;
+          ibmcloud login --apikey $APIKEY -a cloud.ibm.com -r $REGION;
+          TOKEN=$(ibmcloud iam oauth-tokens | cut -c 11-);
+          curl -X GET "https://cloud.ibm.com/devops/toolchains/${TOOLCHAIN_ID}" -H "Accept:application/json" -H "Authorization:${TOKEN}" > testPRJuly/toolchain.json;
+          echo $(node testPRJuly/parser.js);
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: pipeline
+spec:
+  params:
+    - name: apikey
+      description: the ibmcloud api key
+    - name: region
+      description: the ibmcloud region
+      default: us-south
+    - name: toolchainID
+      description: the toolchain id
+  tasks:
+    - name: pipeline-task
+      taskRef:
+        name: task
+      params:
+        - name: apikey
+          value: $(params.apikey)
+        - name: region
+          value: $(params.region)
+        - name: toolchainID
+          value: $(params.toolchainID)
+---
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: template
+spec:
+  params:
+    - name: apikey
+      description: the ibmcloud api key
+    - name: region
+      description: the ibmcloud registry region
+      default: us-south
+    - name: toolchainID
+      description: the toolchain ID
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1alpha1
+      kind: PipelineRun
+      metadata:
+        name: pipelinerun-$(uid)
+      spec:
+        pipelineRef:
+            name: pipeline
+        params:
+        - name: apikey
+          value: $(params.apikey)
+        - name: registryRegion
+          value: $(params.region)
+        - name: toolchainID
+          value: $(params.toolchainID)
+---
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: binding
+spec:
+  params:
+    - name: message
+      value: binding message
+---
+apiVersion: tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: listener
+spec:
+  triggers:
+    - binding:
+        name: binding
+      template:
+        name: template
+      params:
+        - name: message-l
+          value: Hello from the Manual Triggers EventListener!
