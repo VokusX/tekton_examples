@@ -32,7 +32,7 @@ spec:
           ibmcloud login --apikey $APIKEY -a cloud.ibm.com -r $REGION;
           TOKEN=$(ibmcloud iam oauth-tokens | cut -c 11-);
           curl -X GET "https://cloud.ibm.com/devops/toolchains/${TOOLCHAIN_ID}" -H "Accept:application/json" -H "Authorization:${TOKEN}" > tekton_examples/toolchain.json;
-          SLACK_WEBHOOK=$(node tekton_examples/parser.js);
+          SLACK_WEBHOOK=$(node tekton_examples/slack_parser.js);
           curl -X POST -H 'Content-type:application/json' --data '{"text":"Tekton Pipeline ran!"}' $SLACK_WEBHOOK
     - name: git-token
       image: ibmcom/pipeline-base-image
@@ -52,9 +52,8 @@ spec:
           ibmcloud config --check-version=false;
           ibmcloud login --apikey $APIKEY -a cloud.ibm.com -r $REGION;
           TOKEN=$(ibmcloud iam oauth-tokens | cut -c 11-);
-          curl -X GET "https://cloud.ibm.com/devops/toolchains/${TOOLCHAIN_ID}" -H "Accept:application/json" -H "Authorization:${TOKEN}" > tekton_examples/toolchain.json;
-          SLACK_WEBHOOK=$(node tekton_examples/parser.js);
-          curl -X POST -H 'Content-type:application/json' --data '{"text":"Tekton Pipeline ran!"}' $SLACK_WEBHOOK
+          curl -H "Accept:application/json" -H "Authorization:${TOKEN}" "https://otc-github-consolidated-broker.us-east.devops.cloud.ibm.com/github/token?git_id=github";
+          curl -H "Accept:application/json" -H "Authorization:${TOKEN}" "https://otc-github-consolidated-broker.us-east.devops.cloud.ibm.com/github/token?git_id=hostedgit";
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: Pipeline
