@@ -13,7 +13,28 @@ spec:
       - name: toolchainID
         description: the toolchain id        
   steps:
-    - name: get-toolchain-json
+    - name: slack-webhook
+      image: ibmcom/pipeline-base-image
+      env:
+        - name: APIKEY
+          value: $(inputs.params.apikey)
+        - name: REGION
+          value: $(inputs.params.region)
+        - name: TOOLCHAIN_ID
+          value: $(inputs.params.toolchainID)
+        - name: HOME
+          value: "/root"
+      command: ["/bin/sh", "-c"]
+      args:
+        - git clone https://github.com/VokusX/tekton_examples;
+          export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
+          ibmcloud config --check-version=false;
+          ibmcloud login --apikey $APIKEY -a cloud.ibm.com -r $REGION;
+          TOKEN=$(ibmcloud iam oauth-tokens | cut -c 11-);
+          curl -X GET "https://cloud.ibm.com/devops/toolchains/${TOOLCHAIN_ID}" -H "Accept:application/json" -H "Authorization:${TOKEN}" > tekton_examples/toolchain.json;
+          SLACK_WEBHOOK=$(node tekton_examples/parser.js);
+          curl -X POST -H 'Content-type:application/json' --data '{"text":"Tekton Pipeline ran!"}' $SLACK_WEBHOOK
+    - name: git-token
       image: ibmcom/pipeline-base-image
       env:
         - name: APIKEY
