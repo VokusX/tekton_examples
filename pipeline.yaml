@@ -32,7 +32,7 @@ spec:
           ibmcloud login --apikey $APIKEY -a cloud.ibm.com -r $REGION;
           TOKEN=$(ibmcloud iam oauth-tokens | cut -c 11-);
           curl -X GET "https://cloud.ibm.com/devops/toolchains/${TOOLCHAIN_ID}" -H "Accept:application/json" -H "Authorization:${TOKEN}" > tekton_examples/toolchain.json;
-          echo $(node testPRJuly/parser.js);
+          echo $(node tekton_examples/parser.js);
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: Pipeline
