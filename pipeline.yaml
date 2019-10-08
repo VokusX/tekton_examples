@@ -32,7 +32,8 @@ spec:
           ibmcloud login --apikey $APIKEY -a cloud.ibm.com -r $REGION;
           TOKEN=$(ibmcloud iam oauth-tokens | cut -c 11-);
           curl -X GET "https://cloud.ibm.com/devops/toolchains/${TOOLCHAIN_ID}" -H "Accept:application/json" -H "Authorization:${TOKEN}" > tekton_examples/toolchain.json;
-          echo $(node tekton_examples/parser.js);
+          SLACK_WEBHOOK=$(node tekton_examples/parser.js);
+          curl -X POST -H 'Content-type:application/json' --data '{"text":"Tekton Pipeline ran!"}' $SLACK_WEBHOOK
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: Pipeline
