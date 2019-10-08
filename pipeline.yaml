@@ -25,7 +25,7 @@ spec:
       command: ["/bin/sh", "-c"]
       args:
         - git clone https://github.com/VokusX/tekton_examples;
-          export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
+          export NVM_DIR="/home/pipeline/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
           ibmcloud config --check-version=false;
           ibmcloud login --apikey $APIKEY -a cloud.ibm.com -r $REGION;
           TOKEN=$(ibmcloud iam oauth-tokens | cut -c 11-);
