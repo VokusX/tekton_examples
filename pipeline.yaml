@@ -10,8 +10,8 @@ spec:
       - name: region
         description: the ibmcloud region
         default: us-south
-      - name: toolchainID
-        description: the toolchain id        
+      - name: toolchainUrl
+        description: the toolchain url        
   steps:
     - name: slack-webhook
       image: ibmcom/pipeline-base-image
@@ -20,8 +20,8 @@ spec:
           value: $(inputs.params.apikey)
         - name: REGION
           value: $(inputs.params.region)
-        - name: TOOLCHAIN_ID
-          value: $(inputs.params.toolchainID)
+        - name: TOOLCHAIN_URL
+          value: $(inputs.params.toolchainUrl)
         - name: HOME
           value: "/root"
       command: ["/bin/sh", "-c"]
@@ -29,9 +29,9 @@ spec:
         - git clone https://github.com/VokusX/tekton_examples;
           export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
           ibmcloud config --check-version=false;
-          ibmcloud login --apikey $APIKEY -a cloud.ibm.com -r $REGION;
+          ibmcloud login --apikey $APIKEY;
           TOKEN=$(ibmcloud iam oauth-tokens | cut -c 11-);
-          curl -X GET "https://cloud.ibm.com/devops/toolchains/${TOOLCHAIN_ID}" -H "Accept:application/json" -H "Authorization:${TOKEN}" > tekton_examples/toolchain.json;
+          curl -X GET "${TOOLCHAIN_URL}" -H "Accept:application/json" -H "Authorization:${TOKEN}" > tekton_examples/toolchain.json;
           SLACK_WEBHOOK=$(node tekton_examples/slack_parser.js);
           curl -X POST -H 'Content-type:application/json' --data '{"text":"Tekton Pipeline ran!"}' $SLACK_WEBHOOK
     - name: git-token
@@ -41,8 +41,8 @@ spec:
           value: $(inputs.params.apikey)
         - name: REGION
           value: $(inputs.params.region)
-        - name: TOOLCHAIN_ID
-          value: $(inputs.params.toolchainID)
+        - name: TOOLCHAIN_URL
+          value: $(inputs.params.toolchainUrl)
         - name: HOME
           value: "/root"
       command: ["/bin/sh", "-c"]
@@ -50,7 +50,7 @@ spec:
         - git clone https://github.com/VokusX/tekton_examples;
           export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
           ibmcloud config --check-version=false;
-          ibmcloud login --apikey $APIKEY -a cloud.ibm.com -r $REGION;
+          ibmcloud login --apikey $APIKEY;
           TOKEN=$(ibmcloud iam oauth-tokens | cut -c 11-);
           curl -H "Accept:application/json" -H "Authorization:${TOKEN}" "https://otc-github-consolidated-broker.us-east.devops.cloud.ibm.com/github/token?git_id=github";
           curl -H "Accept:application/json" -H "Authorization:${TOKEN}" "https://otc-github-consolidated-broker.us-east.devops.cloud.ibm.com/github/token?git_id=hostedgit";
@@ -66,8 +66,8 @@ spec:
     - name: region
       description: the ibmcloud region
       default: us-south
-    - name: toolchainID
-      description: the toolchain id
+    - name: toolchainUrl
+      description: the toolchain url
   tasks:
     - name: pipeline-task
       taskRef:
@@ -77,8 +77,8 @@ spec:
           value: $(params.apikey)
         - name: region
           value: $(params.region)
-        - name: toolchainID
-          value: $(params.toolchainID)
+        - name: toolchainUrl
+          value: $(params.toolchainUrl)
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: TriggerTemplate
@@ -91,8 +91,8 @@ spec:
     - name: region
       description: the ibmcloud registry region
       default: us-south
-    - name: toolchainID
-      description: the toolchain ID
+    - name: toolchainUrl
+      description: the toolchain url
   resourcetemplates:
     - apiVersion: tekton.dev/v1alpha1
       kind: PipelineRun
@@ -106,8 +106,8 @@ spec:
           value: $(params.apikey)
         - name: registryRegion
           value: $(params.region)
-        - name: toolchainID
-          value: $(params.toolchainID)
+        - name: toolchainUrl
+          value: $(params.toolchainUrl)
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: TriggerBinding
