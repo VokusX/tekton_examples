@@ -29,7 +29,7 @@ spec:
         - git clone https://github.com/VokusX/tekton_examples;
           export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
           ibmcloud config --check-version=false;
-          ibmcloud login --apikey $APIKEY;
+          ibmcloud login --apikey $APIKEY -r $REGION;
           TOKEN=$(ibmcloud iam oauth-tokens | cut -c 11-);
           curl -X GET "${TOOLCHAIN_URL}" -H "Accept:application/json" -H "Authorization:${TOKEN}" > tekton_examples/toolchain.json;
           SLACK_WEBHOOK=$(node tekton_examples/slack_parser.js);
