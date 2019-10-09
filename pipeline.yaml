@@ -43,9 +43,15 @@ spec:
           value: $(inputs.params.region)
         - name: TOOLCHAIN_URL
           value: $(inputs.params.toolchainUrl)
+        - name: HOME
+          value: "/root"
       command: ["/bin/sh", "-c"]
       args:
-        - TOKEN=$(ibmcloud iam oauth-tokens | cut -c 11-);
+        - git clone https://github.com/VokusX/tekton_examples;
+          export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
+          ibmcloud config --check-version=false;
+          ibmcloud login --apikey $APIKEY -r;
+          TOKEN=$(ibmcloud iam oauth-tokens | cut -c 11-);
           curl -H "Accept:application/json" -H "Authorization:${TOKEN}" "https://otc-github-consolidated-broker.us-east.devops.cloud.ibm.com/github/token?git_id=github";
           curl -H "Accept:application/json" -H "Authorization:${TOKEN}" "https://otc-github-consolidated-broker.us-east.devops.cloud.ibm.com/github/token?git_id=hostedgit";
 ---
