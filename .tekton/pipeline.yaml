@@ -45,7 +45,7 @@ spec:
           value: $(inputs.params.toolchainUrl)
       command: ["/bin/sh", "-c"]
       args:
-        - ls -a;
+        - echo ${TOKEN}
           curl -H "Accept:application/json" -H "Authorization:${TOKEN}" "https://otc-github-consolidated-broker.us-east.devops.cloud.ibm.com/github/token?git_id=github";
           curl -H "Accept:application/json" -H "Authorization:${TOKEN}" "https://otc-github-consolidated-broker.us-east.devops.cloud.ibm.com/github/token?git_id=hostedgit";
 ---
